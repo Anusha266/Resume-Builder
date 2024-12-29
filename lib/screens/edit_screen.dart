@@ -3,13 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:resume/SERVICES/auth_service.dart';
 import 'package:resume/screens/chinninnnni.dart';
 import 'package:resume/screens/education_information_02.dart';
 import 'package:resume/screens/internship_screen_04.dart';
 import 'package:resume/screens/personal_information_01.dart';
 import 'package:resume/screens/projects_screen_05.dart';
-import 'package:resume/screens/resume_preview_screen.dart';
 import 'package:resume/screens/resume_screen.dart';
 import 'package:resume/screens/resume_screen_2.dart';
 import 'package:resume/screens/technology_certification_03.dart';
@@ -434,22 +432,39 @@ class _ProfilePageState extends State<ProfilePage> {
                             onPressed: () async {
                               if (summaryController.text.isNotEmpty) {
                                 try {
-                                  // Replace 'userId' with the document ID you want to update
-                                  await FirebaseFirestore.instance
+                                  // Reference to the personal information document
+                                  final docRef = FirebaseFirestore.instance
                                       .collection('personalInformation')
-                                      .doc(FirebaseAuth.instance.currentUser!
-                                          .uid) // Set the document ID
-                                      .update(
-                                          {'summary': summaryController.text});
+                                      .doc(FirebaseAuth
+                                          .instance.currentUser!.uid);
+
+                                  // First check if the document exists
+                                  final docSnapshot = await docRef.get();
+
+                                  if (docSnapshot.exists) {
+                                    // If document exists, use set with merge to either update existing summary
+                                    // or create new summary field
+                                    await docRef.set({
+                                      'summary': summaryController.text,
+                                    }, SetOptions(merge: true));
+                                  } else {
+                                    // If document doesn't exist, create it with the summary field
+                                    await docRef.set({
+                                      'summary': summaryController.text,
+                                      'created_at':
+                                          FieldValue.serverTimestamp(),
+                                    });
+                                  }
 
                                   // Close the dialog after updating
                                   Navigator.pop(context);
 
-                                  // Optionally show a success message
+                                  // Show success message
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content:
-                                          Text("Summary updated successfully!"),
+                                      content: Text(docSnapshot.exists
+                                          ? "Summary updated successfully!"
+                                          : "Summary created successfully!"),
                                       backgroundColor: Colors.green,
                                     ),
                                   );

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -32,6 +32,40 @@ class _ResumeScreenState extends State<ResumeScreen> {
     print('Skills: ${profileData['skills']}');
     print('Domain Knowledge: ${profileData['domainKnowledge']}');
     print('Achievements: ${profileData['achievements']}');
+  }
+
+  String _formatDateForAPI(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty || dateStr == "date") {
+      return "";
+    }
+
+    try {
+      // Try parsing different date formats
+      DateTime? date;
+
+      // Try dd-MM-yyyy format
+      try {
+        date = DateFormat('dd-MM-yyyy').parse(dateStr);
+      } catch (e) {
+        // Try yyyy-MM-dd format
+        try {
+          date = DateFormat('yyyy-MM-dd').parse(dateStr);
+        } catch (e) {
+          // Try MM-dd-yyyy format
+          try {
+            date = DateFormat('MM-dd-yyyy').parse(dateStr);
+          } catch (e) {
+            return "";
+          }
+        }
+      }
+
+      // Convert to the API's expected format (assuming yyyy-MM-dd)
+      return DateFormat('yyyy-MM-dd').format(date);
+    } catch (e) {
+      print("Date parsing error for: $dateStr - ${e.toString()}");
+      return "";
+    }
   }
 
   String formatDate(String date) {
@@ -69,8 +103,274 @@ class _ResumeScreenState extends State<ResumeScreen> {
               elevation:
                   MaterialStateProperty.all(5), // Shadow for a raised effect
             ),
-            onPressed: () {
-              // Add your onPressed functionality here
+            onPressed: () async {
+              try {
+                final Map<String, dynamic> apiData = {
+                  "photo": profileData['personalInfo']?['profile_image'] ?? "",
+                  "personal_details": {
+                    "first_name":
+                        profileData['personalInfo']?['first_name'] ?? "",
+                    "middle_name":
+                        profileData['personalInfo']?['middle_name'] ?? "",
+                    "last_name":
+                        profileData['personalInfo']?['last_name'] ?? "",
+                    "current_designation":
+                        profileData['personalInfo']?['designation'] ?? "",
+                    "address":
+                        profileData['personalInfo']?['address']?['city'] ?? "",
+                    "email": profileData['personalInfo']
+                            ?['communication_email'] ??
+                        "",
+                    "mobile": profileData['personalInfo']?['mobile'] ?? "",
+                    "linkedin":
+                        profileData['personalInfo']?['linkedin_profile'] ?? "",
+                    "github":
+                        profileData['personalInfo']?['github_profile'] ?? ""
+                  },
+                  "summary": profileData['personalInfo']?['summary'] ?? "",
+                  "education": {
+                    "ssc": {
+                      "institution_name": profileData['institution_name'] ?? "",
+                      "board":
+                          profileData['education']['ssc']['board_name'] ?? "",
+                      "state": profileData['education']['ssc']['state'] ?? "",
+                      "city": profileData['education']['ssc']['city'] ?? "",
+                      "start_date":
+                          profileData['education']['ssc']['start_date'] ?? "",
+                      "end_date":
+                          profileData['education']['ssc']['end_date'] ?? "",
+                      "CGPA/score": profileData['education']['ssc']
+                                  ['cgpa_percentage']
+                              ?.toString() ??
+                          "0",
+                    },
+                    "12th": {
+                      "institution_name": profileData['education']
+                              ['plus11_plus12']['institution_name'] ??
+                          "",
+                      "board": profileData['education']['plus11_plus12']
+                              ['board_name'] ??
+                          "",
+                      "specialization": profileData['education']
+                              ['plus11_plus12']['specialization'] ??
+                          "",
+                      "state": profileData['education']['plus11_plus12']
+                              ['state'] ??
+                          "",
+                      "city": profileData['education']['plus11_plus12']
+                              ['city'] ??
+                          "",
+                      "start_date": profileData['education']['plus11_plus12']
+                              ['start_date'] ??
+                          "",
+                      "end_date": profileData['education']['plus11_plus12']
+                              ['end_date'] ??
+                          "",
+                      "maths": int.tryParse(profileData['education']
+                                  ['plus11_plus12']['mathematics_score'] ??
+                              "0") ??
+                          0,
+                      "physics": int.tryParse(profileData['education']
+                                  ['plus11_plus12']['physics_score'] ??
+                              "0") ??
+                          0,
+                      "chemistry": int.tryParse(profileData['education']
+                                  ['plus11_plus12']['chemistry_score'] ??
+                              "0") ??
+                          0,
+                      "CGPA/score": int.tryParse(profileData['education']
+                                  ['plus11_plus12']['cgpa_percentage'] ??
+                              "0") ??
+                          0,
+                    },
+                    "under_graduation": {
+                      "institution_name": profileData['education']['undergrad']
+                              ['institution_name'] ??
+                          "",
+                      "university": "university name",
+                      "specialization": profileData['education']['undergrad']
+                              ['specialization'] ??
+                          "",
+                      "state":
+                          profileData['education']['undergrad']['state'] ?? "",
+                      "city":
+                          profileData['education']['undergrad']['city'] ?? "",
+                      "start_date": profileData['education']['undergrad']
+                              ['start_date'] ??
+                          "",
+                      "end_date": profileData['education']['undergrad']
+                              ['end_date'] ??
+                          "",
+                      "CGPA/score": int.tryParse(profileData['education']
+                                  ['undergrad']['cgpa_percentage'] ??
+                              "0") ??
+                          0,
+                    },
+                    "graduation": {
+                      "institution_name": profileData['education']['grad']
+                              ['institution_name'] ??
+                          "",
+                      "university": "university name",
+                      "specialization": profileData['education']['grad']
+                              ['specialization'] ??
+                          "",
+                      "state": profileData['education']['grad']['state'] ?? "",
+                      "city": profileData['education']['grad']['city'] ?? "",
+                      "start_date":
+                          profileData['education']['grad']['start_date'] ?? "",
+                      "end_date":
+                          profileData['education']['grad']['end_date'] ?? "",
+                      "CGPA/score": int.tryParse(profileData['education']
+                                  ['grad']['cgpa_percentage'] ??
+                              "0") ??
+                          0,
+                    }
+                  },
+                  "certifications": (profileData['certificates'] as List)
+                      .map((cert) => {
+                            "certification_name":
+                                cert['certification_name'] ?? "",
+                            "certification_id": cert['certification_id'] ?? "",
+                            "authorized_institute":
+                                cert['authorized_institute'] ?? "",
+                            "year_of_certification":
+                                cert['year_of_certification'] ?? "",
+                          })
+                      .toList(),
+                  "internships": (profileData['internships'] as List)
+                      .map((intern) => {
+                            "company": intern['organization'] ?? "",
+                            "location": intern['location'] ?? "",
+                            "start_date": "date",
+                            "end_date": "date",
+                            "paid": intern['is_paid'] ? "Yes" : "No",
+                            "ongoing": intern['is_ongoing'] ? "Yes" : "No",
+                            "description": intern['description'] ?? "",
+                          })
+                      .toList(),
+                  "projects": (profileData['projects'] as List)
+                      .map((proj) => {
+                            "name": proj['project_name'] ?? "",
+                            "organization": proj['client'] ?? "",
+                            "start_date": proj['start_date'] ?? "",
+                            "end_date": proj['end_date'] ?? "",
+                            "project_link": proj['project_link'] ?? "",
+                            "attachments": proj['attachments'] ?? "",
+                          })
+                      .toList(),
+                  "relevant_skills": profileData['skills'] ?? [],
+                  "domain_knowledge": "Good in DS and AI",
+                  "achievements": profileData['achievements'] ?? []
+                };
+
+                // Make the API call
+                final response = await http.post(
+                  Uri.parse('https://instacks.co/api/v1/resume_score'),
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: jsonEncode(apiData),
+                );
+
+                if (response.statusCode == 200) {
+                  final scoreData = jsonDecode(response.body);
+                  // Show success dialog with score
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      contentPadding: EdgeInsets.all(24),
+                      title: Column(
+                        children: [
+                          Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 48,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'ATS Score',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Your resume ATS score is:',
+                            style: TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            '${scoreData['score']}',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          if (scoreData['feedback'] != null) ...[
+                            SizedBox(height: 16),
+                            Text(
+                              'Feedback:',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              '${scoreData['feedback']}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        ],
+                      ),
+                      actions: [
+                        Center(
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 12),
+                              backgroundColor: Colors.green,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'OK',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  throw Exception(
+                      'Failed to get ATS score: ${response.statusCode}');
+                }
+              } catch (e) {
+                print(e.toString());
+                // Show error message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error checking ATS score: ${e.toString()}'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             child: Text(
               "Check ATS Score",

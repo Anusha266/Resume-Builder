@@ -415,6 +415,7 @@ class _EducationDataScreenState extends State<EducationDataScreen> {
       TextEditingController();
   final TextEditingController sscStateController = TextEditingController();
   final TextEditingController sscCityController = TextEditingController();
+  final TextEditingController sscCgpaController = TextEditingController();
   DateTime? sscStartDate;
   DateTime? sscEndDate;
   final TextEditingController sscMathematicsScoreController =
@@ -439,7 +440,7 @@ class _EducationDataScreenState extends State<EducationDataScreen> {
       TextEditingController();
   final TextEditingController plus12ChemistryScoreController =
       TextEditingController();
-
+  final TextEditingController plus12CgpaController = TextEditingController();
   DateTime? undergradStartDate;
   DateTime? undergradEndDate;
   final TextEditingController undergradInstitutionController =
@@ -582,6 +583,7 @@ class _EducationDataScreenState extends State<EducationDataScreen> {
             "mathematics_score": sscMathematicsScoreController.text,
             "physics_score": sscPhysicsScoreController.text,
             "chemistry_score": sscChemistryScoreController.text,
+            "cgpa_percentage": sscCgpaController.text
           },
           "plus11_plus12": {
             "stream": selectedStream,
@@ -595,6 +597,7 @@ class _EducationDataScreenState extends State<EducationDataScreen> {
             "mathematics_score": plus12MathematicsScoreController.text,
             "physics_score": plus12PhysicsScoreController.text,
             "chemistry_score": plus12ChemistryScoreController.text,
+            "cgpa_percentage": plus12CgpaController.text
           },
           "undergrad": {
             "institution_name": undergradInstitutionController.text,
@@ -703,7 +706,7 @@ class _EducationDataScreenState extends State<EducationDataScreen> {
                   "Mathematics Score", sscMathematicsScoreController),
               _buildTextField("Physics Score", sscPhysicsScoreController),
               _buildTextField("Chemistry Score", sscChemistryScoreController),
-
+              _buildTextField("CGPA/Percentage", sscCgpaController),
               const SizedBox(height: 16),
 
               // Section: +11 and +12
@@ -734,7 +737,7 @@ class _EducationDataScreenState extends State<EducationDataScreen> {
               _buildTextField("Physics Score", plus12PhysicsScoreController),
               _buildTextField(
                   "Chemistry Score", plus12ChemistryScoreController),
-
+              _buildTextField("CGPA/Percentage", plus12CgpaController),
               const SizedBox(height: 16),
 
               // Section: Under Graduation (Optional)
@@ -911,5 +914,4 @@ class _EducationDataScreenState extends State<EducationDataScreen> {
       ),
     );
   }
-  // Keep all your original widget building methods (_buildTextField, _buildDateField, _buildDropdownField)
 }

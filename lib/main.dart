@@ -1,15 +1,6 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:resume/firebase_options.dart';
-import 'package:resume/pages/home_page.dart';
-import 'package:resume/screens/chinninnnni.dart';
-import 'package:resume/screens/domain_list_screen.dart';
-import 'package:resume/screens/edit_screen.dart';
-import 'package:resume/screens/login_screen.dart';
-import 'package:resume/screens/resume_screen.dart';
-import 'package:resume/screens/resume_template_page.dart';
-import 'package:resume/screens/signup_screen.dart';
 import 'package:resume/screens/splash_screen.dart';
 
 void main() async {

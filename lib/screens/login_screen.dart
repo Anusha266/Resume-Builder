@@ -21,6 +21,9 @@ class _LoginPageState extends State<LoginPage> {
 
   // Method to handle email/password login
   Future<void> _login() async {
+    // First validate the input
+    if (!_validateInput()) return;
+
     setState(() {
       _isLoading = true;
     });
@@ -37,23 +40,123 @@ class _LoginPageState extends State<LoginPage> {
       if (userCredential.user != null) {
         await HelperFunction.saveUserEmail(email);
         await HelperFunction.saveUserLoggedInStatus(true);
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-          (Route<dynamic> route) =>
-              false, // This condition removes all previous routes
+
+        if (mounted) {
+          // Check if widget is still mounted before using context
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+            (Route<dynamic> route) => false,
+          );
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+
+      switch (e.code) {
+        case 'invalid-credential':
+          errorMessage =
+              'Invalid email or password. Please check your credentials and try again.';
+          break;
+        case 'user-disabled':
+          errorMessage =
+              'This account has been disabled. Please contact support.';
+          break;
+        case 'user-not-found':
+          errorMessage =
+              'No account found with this email. Please sign up first.';
+          break;
+        case 'wrong-password':
+          errorMessage = 'Incorrect password. Please try again.';
+          break;
+        case 'invalid-email':
+          errorMessage = 'The email address is badly formatted.';
+          break;
+        case 'too-many-requests':
+          errorMessage =
+              'Too many failed login attempts. Please try again later.';
+          break;
+        default:
+          errorMessage = 'Login failed. Please try again.';
+      }
+
+      if (mounted) {
+        // Check if widget is still mounted before using context
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+            duration: Duration(seconds: 4),
+          ),
         );
       }
     } catch (e) {
-      // Handle errors (e.g., wrong password, email not registered, etc.)
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('An unexpected error occurred. Please try again.'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+          ),
+        );
+      }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+// Add input validation method
+  bool _validateInput() {
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(16),
+        ),
+      );
+      return false;
+    }
+
+    // Basic email validation
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter a valid email address'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(16),
+        ),
+      );
+      return false;
+    }
+
+    // Password length validation
+    if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Password must be at least 6 characters long'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(16),
+        ),
+      );
+      return false;
+    }
+
+    return true;
   }
 
   @override
