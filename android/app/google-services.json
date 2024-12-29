@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "415872787031",
+    "project_id": "buildingresume",
+    "storage_bucket": "buildingresume.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415872787031:android:61ceccc844f3c86672b912",
+        "android_client_info": {
+          "package_name": "com.example.resume"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "415872787031-haq6o5s06kjhrvmibjvfs4pbdp4gabcs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.resume",
+            "certificate_hash": "c063eeba5abea7422623c0851eecf60d644c460b"
+          }
+        },
+        {
+          "client_id": "415872787031-qrhedudt3qiv78lhmbogdh8lubeson52.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGJ6bkcxgTUXbUprpkqu00TYC5-k7f5kA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "415872787031-qrhedudt3qiv78lhmbogdh8lubeson52.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "415872787031-4ngr7v86g61gnn5bngum755l3u6en95u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.resumeBuilder"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415872787031:android:a10271a4d16fe6ca72b912",
+        "android_client_info": {
+          "package_name": "com.resume.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "415872787031-qrhedudt3qiv78lhmbogdh8lubeson52.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGJ6bkcxgTUXbUprpkqu00TYC5-k7f5kA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "415872787031-qrhedudt3qiv78lhmbogdh8lubeson52.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "415872787031-4ngr7v86g61gnn5bngum755l3u6en95u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.resumeBuilder"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
